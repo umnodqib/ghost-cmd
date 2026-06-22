@@ -1,47 +1,54 @@
 #!/bin/bash
-
 # GHOST CMD - Agent Installer
 # Run on each agent server
-
 set -e
 
 echo "🚀 GHOST CMD Agent Installer"
 echo "============================"
 
 # Check if running as root
-if [ "$EUID" -ne 0 ]; then 
-    echo "❌ Please run as root: sudo bash install.sh"
+if [ "$EUID" -ne 0 ]; then
+    echo "❌ Please run as root: sudo bash install-agent.sh"
     exit 1
 fi
 
 # ==========================================
-# 1. Get Dashboard URL from user
+# 1. Get Dashboard URL
 # ==========================================
 read -p "📊 Enter Dashboard URL (e.g., https://dashboard.jujulefek.qzz.io): " DASHBOARD_URL
-
 if [ -z "$DASHBOARD_URL" ]; then
     echo "❌ Dashboard URL cannot be empty"
     exit 1
 fi
 
 # ==========================================
-# 2. System Update
+# 2. System Update & Dependencies (XVFB Fixed)
 # ==========================================
-echo "📦 Updating system packages..."
+echo "📦 Updating system packages and installing dependencies..."
 apt-get update && apt-get upgrade -y
-apt-get install -y python3 python3-pip python3-venv git curl wget xvfb xvfb-run
+
+apt-get install -y \
+    python3 python3-pip python3-venv git curl wget \
+    xvfb x11-utils libx11-6 libxcb1 libxcomposite1 libxdamage1 \
+    libxrandr2 libxtst6 libnss3 libasound2 libatk1.0-0 \
+    libatk-bridge2.0-0 libgtk-3-0 libgbm1 libxshmfence1 \
+    fonts-liberation libappindicator3-1 libdbusmenu-gtk4
+
+echo "✅ Core dependencies & XVFB installed"
 
 # ==========================================
-# 3. Install Chrome
+# 3. Install Google Chrome
 # ==========================================
 echo "🌐 Installing Google Chrome..."
 if ! command -v google-chrome &> /dev/null; then
-    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-    sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+    echo "📦 Installing Chrome via official repository..."
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
     apt-get update
     apt-get install -y google-chrome-stable
+    echo "✅ Google Chrome installed successfully"
 else
-    echo "   ✅ Chrome already installed"
+    echo "✅ Google Chrome already installed"
 fi
 
 # ==========================================
@@ -52,7 +59,6 @@ if [ ! -d "venv" ]; then
     python3 -m venv venv
 fi
 source venv/bin/activate
-
 pip install --upgrade pip
 pip install -r requirements.txt
 
@@ -64,59 +70,18 @@ mkdir -p chrome_profiles
 mkdir -p logs
 
 # ==========================================
-# 6. Setup Cloudflare Tunnel
+# 6. Create environment file
 # ==========================================
-echo "🌐 Setting up Cloudflare Tunnel for Agent..."
-
-if ! command -v cloudflared &> /dev/null; then
-    echo "   Downloading cloudflared..."
-    wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
-    chmod +x cloudflared
-    mv cloudflared /usr/local/bin/
-fi
-
-read -p "   Create new tunnel? (y/n): " CREATE_TUNNEL
-
-if [ "$CREATE_TUNNEL" = "y" ]; then
-    echo "   Authenticating with Cloudflare..."
-    cloudflared tunnel login
-    
-    read -p "   Enter tunnel name (e.g., ghost-agent-01): " AGENT_TUNNEL_NAME
-    
-    AGENT_TUNNEL_ID=$(cloudflared tunnel create $AGENT_TUNNEL_NAME | grep -oP '(?<=\()[a-f0-9\-]+(?=\))' | head -1)
-    
-    read -p "   Enter public hostname (e.g., agent-01.yourdomain.com): " AGENT_HOSTNAME
-    
-    cat > agent-tunnel.yaml <<EOF
-tunnel: $AGENT_TUNNEL_ID
-credentials-file: ~/.cloudflare-warp/cert.pem
-
-ingress:
-  - hostname: $AGENT_HOSTNAME
-    service: http://localhost:7860
-  - service: http_status:404
-EOF
-    
-    echo "   Tunnel created: $AGENT_TUNNEL_ID"
-    echo "   Config saved to agent-tunnel.yaml"
-else
-    echo "   Skipping tunnel creation"
-fi
-
-# ==========================================
-# 7. Create environment file
-# ==========================================
-echo "⚙️  Creating environment configuration..."
-
+echo "⚙️ Creating .env configuration..."
 cat > .env <<EOF
 DASHBOARD_URL=$DASHBOARD_URL
 AUTH_KEY=GHOST_SECRET_2026
 EOF
 
 # ==========================================
-# 8. Create Agent Service
+# 7. Create Agent Systemd Service
 # ==========================================
-echo "⚙️  Creating agent systemd service..."
+echo "⚙️ Creating ghost-agent systemd service..."
 
 cat > /etc/systemd/system/ghost-agent.service <<EOF
 [Unit]
@@ -131,6 +96,9 @@ EnvironmentFile=$(pwd)/.env
 ExecStart=$(pwd)/venv/bin/python3 agent.py
 Restart=always
 RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+Environment=DISPLAY=:99
+XDG_RUNTIME_DIR=/run/user/0
 
 [Install]
 WantedBy=multi-user.target
@@ -140,66 +108,33 @@ systemctl daemon-reload
 systemctl enable ghost-agent.service
 
 # ==========================================
-# 9. Create Tunnel Service (if created)
+# 8. Start Service
 # ==========================================
-if [ "$CREATE_TUNNEL" = "y" ]; then
-    echo "🔗 Creating tunnel systemd service..."
-    
-    cat > /etc/systemd/system/ghost-agent-tunnel.service <<EOF
-[Unit]
-Description=GHOST CMD Agent Tunnel
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=$(pwd)
-ExecStart=/usr/local/bin/cloudflared tunnel --config agent-tunnel.yaml run
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    
-    systemctl daemon-reload
-    systemctl enable ghost-agent-tunnel.service
-fi
-
-# ==========================================
-# 10. Start Services
-# ==========================================
-echo "🚀 Starting services..."
+echo "🚀 Starting agent service..."
 systemctl start ghost-agent.service
 
-if [ "$CREATE_TUNNEL" = "y" ]; then
-    sleep 1
-    systemctl start ghost-agent-tunnel.service
-fi
+sleep 3
 
-sleep 2
-
+# ==========================================
+# 9. Final Message
+# ==========================================
 echo ""
-echo "✅ Installation Complete!"
+echo "✅ Agent Installation Complete!"
 echo "============================"
-echo "📊 Dashboard URL: $DASHBOARD_URL"
-echo "🚀 Agent Port: http://localhost:7860"
-if [ "$CREATE_TUNNEL" = "y" ]; then
-    echo "🌐 Public URL: https://$AGENT_HOSTNAME"
-fi
+echo "📊 Dashboard URL : $DASHBOARD_URL"
+echo "🚀 Agent running on http://localhost:7860"
 echo ""
-echo "🔧 Manage services:"
+echo "🔧 Service Management:"
 echo "   systemctl status ghost-agent"
-if [ "$CREATE_TUNNEL" = "y" ]; then
-    echo "   systemctl status ghost-agent-tunnel"
-fi
 echo "   systemctl restart ghost-agent"
+echo "   systemctl stop ghost-agent"
 echo ""
 echo "📋 Logs:"
 echo "   journalctl -u ghost-agent -f"
-if [ "$CREATE_TUNNEL" = "y" ]; then
-    echo "   journalctl -u ghost-agent-tunnel -f"
-fi
 echo ""
-echo "Agent will now register to dashboard automatically..."
+echo "🎉 Agent siap mendaftar ke Dashboard secara otomatis."
 echo ""
+
+# Show current status
+echo "Current service status:"
+systemctl status ghost-agent --no-pager -l
