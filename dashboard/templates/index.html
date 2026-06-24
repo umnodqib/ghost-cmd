@@ -42,7 +42,7 @@
                 <div class="flex-1 truncate">
                     <h1 class="text-xl md:text-3xl font-black text-white tracking-tighter flex items-center gap-1.5 md:gap-2">
                         GHOST <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">CMD</span>
-                        <span id="live-indicator" class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500 ml-1 md:ml-2 shrink-0 animate-pulse" title="Panel Status"></span>
+                        <span id="live-indicator" class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 ml-1 md:ml-2 shrink-0 animate-pulse" title="Panel Status"></span>
                     </h1>
                     <p id="header-stats" class="text-[9px] md:text-[11px] text-gray-500 font-mono mt-0.5 md:mt-1 truncate">
                         ON: <span class="text-green-500 font-bold" id="stat-online">0</span> | 
@@ -52,7 +52,7 @@
                     </p>
                 </div>
                 <div>
-                    <button onclick="reloadData()" class="text-[9px] md:text-[10px] text-gray-500 hover:text-white hover:bg-indigo-900/30 border border-gray-800 hover:border-indigo-900/50 px-2 py-[6px] md:px-3 md:py-2 rounded-lg transition">🔄 SYNC</button>
+                    <button onclick="reloadData()" class="text-[9px] md:text-[10px] text-gray-500 hover:text-white hover:bg-indigo-900/30 border border-gray-800 hover:border-indigo-900/50 px-2 py-1.5 rounded-lg transition active:scale-95">🔄 SYNC</button>
                 </div>
             </div>
         </div>
@@ -66,49 +66,45 @@
 
     <!-- Bottom Controls -->
     <div class="fixed bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-4xl">
-        <div class="bg-[#0a0a0a]/90 backdrop-blur-xl border border-white/10 p-2 md:p-3 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.8)] flex overflow-x-auto hide-scrollbar gap-2 md:justify-center md:flex-wrap">
+        <div class="bg-[#0a0a0a]/90 backdrop-blur-xl border border-white/10 p-2 md:p-3 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.8)] flex overflow-x-auto hide-scrollbar gap-2 md:justify-center">
             
-            <button onclick="toggleSelectAll()" id="select-all-btn" class="shrink-0 flex-1 min-w-[65px] bg-black/50 hover:bg-gray-800 border border-gray-700/50 text-gray-400 px-2 py-2.5 rounded-xl text-[10px] font-bold transition-all shadow-lg active:scale-95 flex flex-col items-center justify-center gap-1 group">
+            <button onclick="toggleSelectAll()" id="select-all-btn" class="shrink-0 flex-1 min-w-[65px] bg-black/50 hover:bg-gray-800 border border-gray-700/50 text-gray-400 px-2 py-2.5 rounded-xl text-[10px] font-bold transition active:scale-95 group">
                 <span class="text-sm group-hover:scale-110 transition-transform">🔲</span>
                 <span class="tracking-wider">ALL</span>
             </button>
 
-            <button onclick="massCmd('login')" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 border border-blue-600/30 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition-all shadow-lg active:scale-95 flex flex-col items-center justify-center gap-1 group">
+            <button onclick="massCmd('login')" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 border border-blue-600/30 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition active:scale-95 group">
                 <span class="text-sm group-hover:-translate-y-0.5 transition-transform">🚀</span>
                 <span class="tracking-wider">LOGIN</span>
             </button>
-            <button onclick="massCmd('loop')" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-purple-900 to-purple-700 hover:from-purple-800 hover:to-purple-600 border border-purple-600/30 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition-all shadow-lg active:scale-95 flex flex-col items-center justify-center gap-1 group">
+            <button onclick="massCmd('loop')" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-purple-900 to-purple-700 hover:from-purple-800 hover:to-purple-600 border border-purple-600/30 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition active:scale-95 group">
                 <span class="text-sm group-hover:-rotate-90 transition-transform duration-300">🔄</span>
                 <span class="tracking-wider">LOOP</span>
             </button>
-            <button onclick="massCmd('stop')" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-red-950 to-red-800 border border-red-700/50 hover:from-red-900 hover:to-red-700 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition-all shadow-lg active:scale-95 flex flex-col items-center justify-center gap-1 group">
+            <button onclick="massCmd('stop')" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-red-950 to-red-800 border border-red-700/50 hover:from-red-900 hover:to-red-700 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition active:scale-95 group">
                 <span class="text-sm group-hover:scale-110 transition-transform">🛑</span>
                 <span class="tracking-wider">STOP</span>
             </button>
             
             <div class="shrink-0 w-[1px] h-10 bg-white/10 mx-0.5"></div>
             
-            <button onclick="massCmd('sync')" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-cyan-900 to-cyan-700 hover:from-cyan-800 hover:to-cyan-600 border border-cyan-600/30 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition-all shadow-lg active:scale-95 flex flex-col items-center justify-center gap-1 group">
+            <button onclick="massCmd('sync')" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-cyan-900 to-cyan-700 hover:from-cyan-800 hover:to-cyan-600 border border-cyan-600/30 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition active:scale-95 group">
                 <span class="text-sm group-hover:-translate-y-0.5 transition-transform">📡</span>
                 <span class="tracking-wider">SYNC</span>
             </button>
             
-            <button onclick="openBulkModal()" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-emerald-900 to-emerald-700 hover:from-emerald-800 hover:to-emerald-600 border border-emerald-600/30 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition-all shadow-lg active:scale-95 flex flex-col items-center justify-center gap-1 group">
+            <button onclick="openBulkModal()" class="shrink-0 flex-1 min-w-[70px] bg-gradient-to-t from-emerald-900 to-emerald-700 hover:from-emerald-800 hover:to-emerald-600 border border-emerald-600/30 text-white px-2 py-2.5 rounded-xl text-[10px] font-bold transition active:scale-95 group">
                 <span class="text-sm group-hover:scale-110 transition-transform">📦</span>
                 <span class="tracking-wider">BULK</span>
-            </button>
-            <button onclick="massCmd('clean')" class="shrink-0 flex-1 min-w-[70px] bg-black/50 hover:bg-orange-950/80 border border-orange-900/30 text-orange-500 hover:text-orange-400 px-2 py-2.5 rounded-xl text-[10px] font-bold transition-all shadow-lg active:scale-95 flex flex-col items-center justify-center gap-1 group">
-                <span class="text-sm group-hover:scale-110 transition-transform">🧹</span>
-                <span class="tracking-wider">PURGE</span>
             </button>
             
             <div class="shrink-0 w-[1px] h-10 bg-white/10 mx-0.5 hidden md:block"></div>
 
-            <button onclick="changeSlots()" class="shrink-0 flex-1 min-w-[70px] bg-black/50 hover:bg-gray-800 border border-gray-700/50 text-gray-300 px-2 py-2.5 rounded-xl text-[10px] font-bold transition-all shadow-lg active:scale-95 flex flex-col items-center justify-center gap-1 group">
+            <button onclick="changeSlots()" class="shrink-0 flex-1 min-w-[70px] bg-black/50 hover:bg-gray-800 border border-gray-700/50 text-gray-300 px-2 py-2.5 rounded-xl text-[10px] font-bold transition active:scale-95 group">
                 <span class="text-sm group-hover:rotate-90 transition-transform duration-300">⚙️</span>
                 <span class="tracking-wider">MAX: 192</span>
             </button>
-            <button onclick="changeGrid()" class="shrink-0 flex-1 min-w-[70px] hidden md:flex bg-black/50 hover:bg-gray-800 border border-gray-700/50 text-gray-300 px-2 py-2.5 rounded-xl text-[10px] font-bold transition-all shadow-lg active:scale-95 flex-col items-center justify-center gap-1 group">
+            <button onclick="changeGrid()" class="shrink-0 flex-1 min-w-[70px] hidden md:flex bg-black/50 hover:bg-gray-800 border border-gray-700/50 text-gray-300 px-2 py-2.5 rounded-xl text-[10px] font-bold transition active:scale-95 group">
                 <span class="text-sm group-hover:rotate-180 transition-transform duration-300">📱</span>
                 <span id="grid-display" class="tracking-wider">GRID: 6</span>
             </button>
@@ -135,26 +131,50 @@
 
     <!-- Edit Slot Modal -->
     <div id="modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/90 p-3 md:p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-[#111] border border-gray-800 rounded-2xl w-full max-w-2xl flex flex-col max-h-[90vh] shadow-2xl overflow-hidden">
+        <div class="bg-[#111] border border-gray-800 rounded-2xl w-full max-w-3xl flex flex-col max-h-[90vh] shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-[#151515]">
                 <h3 class="font-bold text-white text-sm md:text-base flex items-center gap-2">
                     ✏️ Edit Data Slot <span id="m_slot" class="text-indigo-400 font-black text-lg bg-indigo-900/30 px-2 rounded"></span>
                 </h3>
                 <button onclick="closeModal()" class="text-gray-500 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition">✕</button>
             </div>
-            <div class="p-4 md:p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 bg-[#0a0a0a]">
-                <div class="flex flex-col relative group">
-                    <label class="text-[10px] font-black text-blue-500 mb-2 tracking-widest uppercase flex items-center gap-1"><span>📧</span> Daftar Email</label>
-                    <textarea id="m_emails" class="flex-1 min-h-[150px] md:min-h-[200px] bg-black border border-gray-800 focus:border-blue-500 rounded-xl p-3 text-xs text-gray-300 resize-none outline-none font-mono focus:ring-1 focus:ring-blue-500/50"></textarea>
+            <div class="p-4 md:p-5 overflow-y-auto space-y-4 bg-[#0a0a0a]">
+                <!-- Format Selector -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-black text-green-500 uppercase tracking-widest">📋 Format Input</label>
+                    <div class="flex gap-2">
+                        <label class="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-700 cursor-pointer hover:bg-gray-800 transition" id="format-plain-label">
+                            <input type="radio" name="m_format" value="plain_email" checked onchange="updateFormatUI()">
+                            <span class="text-xs text-gray-300">📧 Plain Email</span>
+                        </label>
+                        <label class="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-700 cursor-pointer hover:bg-gray-800 transition" id="format-pwd-label">
+                            <input type="radio" name="m_format" value="email_password" onchange="updateFormatUI()">
+                            <span class="text-xs text-gray-300">🔐 Email:Password</span>
+                        </label>
+                    </div>
                 </div>
-                <div class="flex flex-col relative group">
-                    <label class="text-[10px] font-black text-purple-500 mb-2 tracking-widest uppercase flex items-center gap-1"><span>🔗</span> Link Target</label>
-                    <textarea id="m_links" class="flex-1 min-h-[150px] md:min-h-[200px] bg-black border border-gray-800 focus:border-purple-500 rounded-xl p-3 text-xs text-gray-300 resize-none outline-none font-mono focus:ring-1 focus:ring-purple-500/50"></textarea>
+
+                <!-- Credentials Input -->
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="flex flex-col relative group">
+                        <label class="text-[10px] font-black text-blue-500 mb-2 tracking-widest uppercase flex items-center gap-1">
+                            <span id="format-icon">📧</span> 
+                            <span id="format-label">Daftar Email</span>
+                        </label>
+                        <textarea id="m_credentials" class="h-[150px] md:h-[200px] bg-black border border-gray-800 focus:border-blue-500 rounded-xl p-3 text-xs text-gray-300 resize-none outline-none font-mono" 
+                        placeholder="email1@gmail.com&#10;email2@gmail.com&#10;&#10;Atau dengan format:&#10;email1@gmail.com:password1&#10;email2@gmail.com:password456"></textarea>
+                        <p class="text-[9px] text-gray-500 mt-1">💡 Gunakan format <code>email:password</code> untuk input dengan password</p>
+                    </div>
+
+                    <div class="flex flex-col relative group">
+                        <label class="text-[10px] font-black text-purple-500 mb-2 tracking-widest uppercase flex items-center gap-1"><span>🔗</span> Link Target</label>
+                        <textarea id="m_links" class="h-[150px] md:h-[200px] bg-black border border-gray-800 focus:border-purple-500 rounded-xl p-3 text-xs text-gray-300 resize-none outline-none font-mono" placeholder="https://example1.com&#10;https://example2.com"></textarea>
+                    </div>
                 </div>
             </div>
             <div class="p-4 border-t border-gray-800 flex flex-col md:flex-row gap-3 bg-[#151515]">
                 <button onclick="closeModal()" class="px-4 border border-gray-700 hover:bg-gray-800 text-gray-400 py-3 rounded-xl text-xs font-bold transition active:scale-[0.98] w-full md:w-auto">BATAL</button>
-                <button onclick="save()" id="btnSave" class="flex-1 bg-gradient-to-r from-indigo-700 to-purple-700 hover:from-indigo-600 hover:to-purple-600 text-white py-3 rounded-xl text-xs font-bold transition active:scale-95 shadow-lg">💾 SIMPAN</button>
+                <button onclick="save()" id="btnSave" class="flex-1 bg-gradient-to-r from-indigo-700 to-purple-700 hover:from-indigo-600 hover:to-purple-600 text-white py-3 rounded-xl text-xs font-bold transition active:scale-95">💾 SIMPAN</button>
             </div>
         </div>
     </div>
@@ -181,7 +201,7 @@
                 </div>
             </div>
             <div class="p-4 border-t border-gray-800 bg-[#0d1612]">
-                <button onclick="saveBulk()" id="btnBulkSave" class="w-full bg-gradient-to-r from-emerald-700 to-green-700 hover:from-emerald-600 hover:to-green-600 text-white py-3.5 rounded-xl text-xs font-bold transition active:scale-95 shadow-lg">📤 UPLOAD</button>
+                <button onclick="saveBulk()" id="btnBulkSave" class="w-full bg-gradient-to-r from-emerald-700 to-green-700 hover:from-emerald-600 hover:to-green-600 text-white py-3.5 rounded-xl text-xs font-black transition active:scale-95">📤 UPLOAD</button>
             </div>
         </div>
     </div>
@@ -261,6 +281,20 @@
         function openBulkModal() { isModalOpen = true; renderBulkModal(); document.getElementById('bulkModal').classList.remove('hidden'); }
         function closeBulkModal() { isModalOpen = false; document.getElementById('bulkModal').classList.add('hidden'); }
 
+        function updateFormatUI() {
+            const format = document.querySelector('input[name="m_format"]:checked').value;
+            const icon = document.getElementById('format-icon');
+            const label = document.getElementById('format-label');
+            
+            if (format === 'email_password') {
+                icon.textContent = '🔐';
+                label.textContent = 'Email:Password';
+            } else {
+                icon.textContent = '📧';
+                label.textContent = 'Daftar Email';
+            }
+        }
+
         function updateSelectionUI() {
             const selectBtn = document.getElementById('select-all-btn');
             if (!selectBtn) return;
@@ -301,28 +335,29 @@
             container.innerHTML = '';
 
             allSlots.forEach(slot => {
+                const statusColor = slot.isOffline ? 'text-gray-700/50 italic' : 'text-emerald-400';
                 const cardHTML = `
-                <div class="relative bg-[#111] ${slot.isOffline ? 'border-gray-800/60 bg-[#0b0c10]' : 'border-purple-900/60'} rounded-2xl p-4 md:p-5 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 status-update">
+                <div class="relative bg-[#111] ${slot.isOffline ? 'border-gray-800/60 bg-[#0b0c10]' : 'border-purple-900/60'} rounded-2xl p-4 md:p-5 shadow-lg hover:shadow-2xl transition-all duration-300 border">
                     <div>
                         <div class="flex justify-between items-start mb-3">
                             <div class="w-full overflow-hidden">
                                 <div class="flex items-center gap-2 mb-0.5">
-                                    <input type="checkbox" class="slot-cb w-4 h-4 rounded border-gray-700 bg-black/50 text-indigo-500 focus:ring-indigo-500 cursor-pointer transition" value="${slot.id}" onchange="handleCheckbox(this)" />
+                                    <input type="checkbox" class="slot-cb w-4 h-4 rounded border-gray-700 bg-black/50 text-indigo-500 focus:ring-indigo-500 cursor-pointer transition" value="${slot.id}" onchange="handleCheckbox(this)">
                                     <div class="text-[10px] text-gray-500 font-bold tracking-widest cursor-default">SLOT</div>
                                 </div>
                                 <div class="text-2xl font-black text-white leading-none">${slot.id}</div>
-                                <div class="text-[9px] font-mono ${slot.isOffline ? 'text-gray-700/50 italic' : 'text-emerald-400'} mt-1 truncate max-w-[140px]">${slot.status}</div>
+                                <div class="text-[9px] font-mono ${statusColor} mt-1 truncate max-w-[140px]">${slot.status}</div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0 ml-2">
                                 ${slot.isLooping ? 
-                                    `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-900/40 text-purple-400 border border-purple-500/50 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.3)]">🔄 LOOP</span>` :
-                                    `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-800 text-gray-500 border border-gray-600 shadow-inner">OFFLINE</span>`
+                                    `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-900/40 text-purple-400 border border-purple-500/50 animate-pulse">LOOPING</span>` :
+                                    `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${slot.isOffline ? 'bg-gray-800 text-gray-500 border border-gray-600' : 'bg-green-900/40 text-green-400 border border-green-500/50'}">${slot.isOffline ? 'OFFLINE' : 'ONLINE'}</span>`
                                 }
                             </div>
                         </div>
                         <button onclick="editSlot(${slot.id})" class="w-full bg-black/40 hover:bg-black border border-white/5 hover:border-indigo-500/50 transition-all rounded-xl p-3 flex justify-between items-center group/btn">
                             <div class="text-[10px] text-gray-400 group-hover/btn:text-indigo-300 text-left">
-                                <div class="mb-1">📧 <span class="text-white font-bold text-xs">${slot.emails}</span> Emails</div>
+                                <div class="mb-1">📧 <span class="text-white font-bold text-xs">${slot.emails}</span> ${slot.format_type === 'email_password' ? 'Accts' : 'Emails'}</div>
                                 <div>🔗 <span class="text-white font-bold text-xs">${slot.links}</span> Links</div>
                             </div>
                             <div class="text-gray-600 group-hover/btn:text-white transition-colors">✏️</div>
@@ -333,12 +368,12 @@
                         }
                     </div>
                     <div class="grid grid-cols-3 gap-1.5 mt-4">
-                        <button onclick="cmd(${slot.id}, 'login')" class="bg-gradient-to-t from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white py-1.5 rounded-lg text-[10px] font-bold transition active:scale-95 shadow-md">🚀</button>
-                        <button onclick="cmd(${slot.id}, 'loop')" class="bg-gradient-to-t from-purple-900 to-purple-700 hover:from-purple-800 hover:to-purple-600 text-white py-1.5 rounded-lg text-[10px] font-bold transition active:scale-95 shadow-md">🔄</button>
+                        <button onclick="cmd(${slot.id}, 'login')" class="bg-gradient-to-t from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white py-1.5 rounded-lg text-[10px] font-bold transition active:scale-95">🚀</button>
+                        <button onclick="cmd(${slot.id}, 'loop')" class="bg-gradient-to-t from-purple-900 to-purple-700 hover:from-purple-800 hover:to-purple-600 text-white py-1.5 rounded-lg text-[10px] font-bold transition active:scale-95">🔄</button>
                         <button onclick="viewLogs(${slot.id})" class="bg-[#161b22] hover:bg-[#21262d] text-gray-300 py-1.5 rounded-lg text-[10px] font-bold transition active:scale-95 shadow-md border border-gray-700">📋</button>
                     </div>
                     <div class="mt-1.5">
-                        <button onclick="cmd(${slot.id}, 'stop')" class="w-full bg-gradient-to-t from-red-950 to-red-800 hover:from-red-900 hover:to-red-700 text-red-100 py-1.5 rounded-lg text-[10px] font-bold transition active:scale-95 shadow-md border border-red-900/50">🛑 STOP</button>
+                        <button onclick="cmd(${slot.id}, 'stop')" class="w-full bg-gradient-to-t from-red-950 to-red-800 hover:from-red-900 hover:to-red-700 text-red-100 py-1.5 rounded-lg text-[10px] font-bold transition active:scale-95 shadow-md">🛑 STOP</button>
                     </div>
                 </div>`;
                 container.innerHTML += cardHTML;
@@ -371,10 +406,8 @@
                 const data = await resp.json();
                 
                 if (data.changed) {
-                    // Ada perubahan, update data
                     allSlots = data.slots;
                     
-                    // Update stats
                     const status = await fetch(`${API_BASE}/api/status`);
                     const stats = await status.json();
                     
@@ -404,7 +437,7 @@
                 document.getElementById('stat-data').textContent = stats.data;
                 
                 renderCards();
-                showToast('Data refreshed', 'info');
+                showToast('✓ Data refreshed', 'success');
             } catch (e) {
                 showToast('Failed to reload: ' + e.message, 'error');
             }
@@ -418,15 +451,37 @@
             
             const slot = allSlots.find(s => s.id === slotId);
             if (slot) {
-                document.getElementById('m_emails').value = slot.emails_file;
-                document.getElementById('m_links').value = slot.links_file;
+                const format = slot.format_type || 'plain_email';
+                document.querySelector(`input[name="m_format"][value="${format}"]`).checked = true;
+                
+                if (format === 'email_password' && slot.credentials && slot.credentials.length > 0) {
+                    const cred_text = slot.credentials.map(c => `${c.email}:${c.password}`).join('\n');
+                    document.getElementById('m_credentials').value = cred_text;
+                } else {
+                    document.getElementById('m_credentials').value = slot.emails_file || '';
+                }
+                
+                document.getElementById('m_links').value = slot.links_file || '';
+                updateFormatUI();
             }
         }
 
         async function save() {
             try {
-                const emails = document.getElementById('m_emails').value;
+                const format = document.querySelector('input[name="m_format"]:checked').value;
+                const credentials_raw = document.getElementById('m_credentials').value;
                 const links = document.getElementById('m_links').value;
+                
+                let payload = {
+                    format_type: format,
+                    links_file: links
+                };
+                
+                if (format === 'email_password') {
+                    payload.credentials_raw = credentials_raw;
+                } else {
+                    payload.emails_file = credentials_raw;
+                }
                 
                 const resp = await fetch(`${API_BASE}/api/slot/${currentSlot}`, {
                     method: 'POST',
@@ -434,10 +489,7 @@
                         'Content-Type': 'application/json',
                         'X-Auth-Key': AUTH
                     },
-                    body: JSON.stringify({
-                        emails_file: emails,
-                        links_file: links
-                    })
+                    body: JSON.stringify(payload)
                 });
                 
                 if (resp.ok) {
@@ -586,12 +638,7 @@
             const gridDisp = document.getElementById('grid-display');
             if (gridDisp) gridDisp.innerText = `GRID: ${currentGrid}`;
             
-            // Live indicator
-            const indicator = document.getElementById('live-indicator');
-            indicator.classList.remove('bg-red-500');
-            indicator.classList.add('bg-green-500', 'animate-pulse');
-            
-            // Smart refresh: cek perubahan setiap 3 detik, hanya reload kalau ada perubahan
+            // Smart refresh: cek perubahan setiap 3 detik
             autoRefreshInterval = setInterval(() => checkForChanges(), 3000);
             
             // Full reload manual setiap 30 detik (safety)
@@ -607,23 +654,6 @@
         window.addEventListener('beforeunload', () => {
             if (autoRefreshInterval) clearInterval(autoRefreshInterval);
         });
-
-        // Expose functions
-        window.editSlot = editSlot;
-        window.viewLogs = viewLogs;
-        window.cmd = cmd;
-        window.massCmd = massCmd;
-        window.toggleSelectAll = toggleSelectAll;
-        window.changeGrid = changeGrid;
-        window.changeSlots = changeSlots;
-        window.openBulkModal = openBulkModal;
-        window.closeModal = closeModal;
-        window.closeLogModal = closeLogModal;
-        window.closeBulkModal = closeBulkModal;
-        window.save = save;
-        window.saveBulk = saveBulk;
-        window.handleCheckbox = handleCheckbox;
-        window.reloadData = reloadData;
     </script>
 </body>
 </html>
