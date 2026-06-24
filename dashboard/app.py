@@ -267,6 +267,11 @@ def slot_handler(slot_id):
             slot['links_file'] = data['links_file']
         
         slot_manager.save_slot(slot_id, slot)
+        
+        # ✅ NEW: Push data ke agent jika sudah connected
+        if slot.get('agent_url'):
+            push_data_to_agent(slot_id, slot)
+        
         return jsonify({"status": "saved", "format": format_type})
 
 @app.route('/api/register', methods=['POST'])
@@ -377,6 +382,57 @@ def send_command(slot_id, command):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/push/<int:slot_id>', methods=['POST'])
+@require_auth
+def push_data_endpoint(slot_id):
+    """Push data to agent manually"""
+    slot = slot_manager.get_slot(slot_id)
+    if not slot.get('agent_url'):
+        return jsonify({"error": "Agent not connected"}), 400
+    
+    success = push_data_to_agent(slot_id, slot)
+    if success:
+        return jsonify({"status": "pushed"})
+    else:
+        return jsonify({"error": "Failed to push"}), 500
+
+def push_data_to_agent(slot_id, slot):
+    """Helper function to push data to agent"""
+    agent_url = slot.get('agent_url')
+    if not agent_url:
+        return False
+    
+    try:
+        # Format data sesuai dengan format_type
+        format_type = slot.get('format_type', 'plain_email')
+        
+        if format_type == 'email_password':
+            # Send credentials
+            payload = {
+                "format_type": "email_password",
+                "credentials": slot.get('credentials', []),
+                "links": [l.strip() for l in slot.get('links_file', '').split('\n') if l.strip()]
+            }
+        else:
+            # Plain email format
+            payload = {
+                "format_type": "plain_email",
+                "emails": [e.strip() for e in slot.get('emails_file', '').split('\n') if e.strip()],
+                "links": [l.strip() for l in slot.get('links_file', '').split('\n') if l.strip()]
+            }
+        
+        resp = requests.post(
+            f"{agent_url}/update_data",
+            json=payload,
+            headers={"X-Auth-Key": AUTH_KEY},
+            timeout=10,
+            verify=False
+        )
+        return resp.status_code == 200
+    except Exception as e:
+        print(f"Error pushing data to agent {slot_id}: {e}")
+        return False
+
 @app.route('/api/logs/<int:slot_id>')
 @require_auth
 def get_logs(slot_id):
@@ -424,6 +480,10 @@ def bulk_upload():
         slot['format_type'] = 'plain_email'
         slot['credentials'] = []
         slot_manager.save_slot(slot_id, slot)
+        
+        # ✅ NEW: Push data ke agent jika connected
+        if slot.get('agent_url'):
+            push_data_to_agent(slot_id, slot)
     
     return jsonify({"status": "uploaded", "slots": selected_slots})
 
