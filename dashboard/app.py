@@ -107,7 +107,7 @@ class SlotManager:
         return self.slots.get(slot_id, {})
     
     def get_all_slots(self):
-        """Get all slots - hanya yang ada agent (online/busy)"""
+        """Get hanya active slots saja (yang ada agent)"""
         return [s for s in self.slots.values() if s['agent_url']]
     
     def get_all_slots_full(self):
@@ -140,7 +140,7 @@ class SlotManager:
             slot["isOffline"] = False
         elif "IDLE" in status or "Connected" in status or "READY" in status:
             slot["isLooping"] = False
-            slot["isOffline"] = False  # IDLE = ONLINE tapi tidak sibuk
+            slot["isOffline"] = False  # IDLE = ONLINE (terhubung & siap)
         else:
             slot["isOffline"] = True
         
