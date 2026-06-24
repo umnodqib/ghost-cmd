@@ -78,6 +78,8 @@ class SlotManager:
             "agent_url": None,
             "emails_file": "",
             "links_file": "",
+            "format_type": "plain_email",
+            "credentials": []
         }
         
         if slot_file.exists():
@@ -86,7 +88,10 @@ class SlotManager:
                     data = json.load(f)
                     default.update(data)
                     # Count emails and links
-                    default["emails"] = len([l for l in data.get("emails_file", "").split("\n") if l.strip()])
+                    if data.get("format_type") == "email_password" and data.get("credentials"):
+                        default["emails"] = len(data.get("credentials", []))
+                    else:
+                        default["emails"] = len([l for l in data.get("emails_file", "").split("\n") if l.strip()])
                     default["links"] = len([l for l in data.get("links_file", "").split("\n") if l.strip()])
             except:
                 pass
@@ -134,15 +139,20 @@ class SlotManager:
         if ip:
             slot["ip"] = ip
         
-        # Status logic yang benar
-        if "BUSY" in status:
+        # ✅ FIX: Normalize status (case-insensitive, remove emoji)
+        status_normalized = status.upper().replace("🔌", "").replace("✅", "").replace("💀", "").strip()
+        
+        # Status logic yang diperbaiki
+        if "BUSY" in status_normalized:
             slot["isLooping"] = True
             slot["isOffline"] = False
-        elif "IDLE" in status or "Connected" in status or "READY" in status:
+        elif any(x in status_normalized for x in ["IDLE", "CONNECTED", "READY", "WS", "OK", "REGISTER"]):
             slot["isLooping"] = False
-            slot["isOffline"] = False  # IDLE = ONLINE (terhubung & siap)
+            slot["isOffline"] = False  # ✅ ONLINE (terhubung & siap)
         else:
-            slot["isOffline"] = True
+            # ✅ FIX: Default assume ONLINE jika status dikirim (agent responsive)
+            slot["isLooping"] = False
+            slot["isOffline"] = False
         
         self.save_slot(slot_id, slot)
 
@@ -218,13 +228,46 @@ def slot_handler(slot_id):
         data = request.get_json()
         slot = slot_manager.get_slot(slot_id)
         
-        if 'emails_file' in data:
-            slot['emails_file'] = data['emails_file']
+        # ✅ NEW: Support email:password format
+        format_type = data.get('format_type', 'plain_email')
+        
+        if format_type == 'email_password':
+            # Parse "email:password" format
+            raw_credentials = data.get('credentials_raw', '')
+            credentials = []
+            
+            for line in raw_credentials.strip().split('\n'):
+                line = line.strip()
+                if not line:
+                    continue
+                
+                if ':' in line:
+                    parts = line.split(':', 1)
+                    credentials.append({
+                        "email": parts[0].strip(),
+                        "password": parts[1].strip()
+                    })
+                else:
+                    credentials.append({
+                        "email": line,
+                        "password": ""
+                    })
+            
+            slot['credentials'] = credentials
+            slot['format_type'] = 'email_password'
+            slot['emails_file'] = '\n'.join([c['email'] for c in credentials])
+        
+        else:  # plain_email format (backward compatible)
+            if 'emails_file' in data:
+                slot['emails_file'] = data['emails_file']
+            slot['format_type'] = 'plain_email'
+            slot['credentials'] = []
+        
         if 'links_file' in data:
             slot['links_file'] = data['links_file']
         
         slot_manager.save_slot(slot_id, slot)
-        return jsonify({"status": "saved"})
+        return jsonify({"status": "saved", "format": format_type})
 
 @app.route('/api/register', methods=['POST'])
 @require_auth
@@ -245,7 +288,15 @@ def register_agent():
             slot['isOffline'] = False
             
             # Load emails and links for this slot
-            emails = slot['emails_file'].split('\n') if slot['emails_file'] else []
+            if slot.get('format_type') == 'email_password' and slot.get('credentials'):
+                # Send credentials dengan password
+                emails = [c['email'] for c in slot['credentials']]
+                credentials = slot['credentials']
+            else:
+                # Plain email format
+                emails = slot['emails_file'].split('\n') if slot['emails_file'] else []
+                credentials = []
+            
             links = slot['links_file'].split('\n') if slot['links_file'] else []
             
             slot_manager.save_slot(slot_id, slot)
@@ -254,7 +305,9 @@ def register_agent():
                 "slot": slot_id,
                 "locker": {
                     "emails": [e.strip() for e in emails if e.strip()],
-                    "links": [l.strip() for l in links if l.strip()]
+                    "links": [l.strip() for l in links if l.strip()],
+                    "credentials": credentials,
+                    "format_type": slot.get('format_type', 'plain_email')
                 }
             }), 200
     
@@ -368,6 +421,8 @@ def bulk_upload():
         slot = slot_manager.get_slot(slot_id)
         slot['emails_file'] = '\n'.join(emails[start_e:end_e])
         slot['links_file'] = '\n'.join(links[start_l:end_l])
+        slot['format_type'] = 'plain_email'
+        slot['credentials'] = []
         slot_manager.save_slot(slot_id, slot)
     
     return jsonify({"status": "uploaded", "slots": selected_slots})
