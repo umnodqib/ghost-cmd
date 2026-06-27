@@ -53,21 +53,42 @@ mkdir -p chrome_profiles
 mkdir -p logs
 
 # ==========================================
-# 4. Configure Environment
+# 4. Configure Environment (AUTO TRY CLOUDFLARE)
 # ==========================================
 echo "⚙️ Configuring environment..."
 
-# Create .env file if not exists
+# Auto start temporary tunnel jika belum ada
+echo "🌐 Memulai Cloudflare Tunnel otomatis..."
+if ! pgrep -f "cloudflared.*trycloudflare" > /dev/null; then
+    echo "🚀 Menjalankan cloudflared tunnel..."
+    nohup cloudflared tunnel --url http://localhost:7860 > tunnel.log 2>&1 &
+    sleep 4  # Tunggu tunnel aktif
+fi
+
+# Ambil URL dari log tunnel
+AGENT_PUBLIC_URL=$(grep -o 'https://[^ ]*\.trycloudflare\.com' tunnel.log | head -n 1)
+
+if [ -z "$AGENT_PUBLIC_URL" ]; then
+    echo "⚠️ Gagal mendeteksi URL tunnel otomatis."
+    read -p "🔗 Masukkan manual Public URL Agent: " AGENT_PUBLIC_URL
+    AGENT_PUBLIC_URL="${AGENT_PUBLIC_URL:-http://localhost:7860}"
+else
+    echo "✅ Auto detect TryCloudflare URL: $AGENT_PUBLIC_URL"
+fi
+
+# Create .env
 if [ ! -f ".env" ]; then
     echo "📝 Creating .env file..."
+    
     read -p "📡 Enter Dashboard URL [https://dashboard.jujulefek.qzz.io]: " DASHBOARD_URL
     DASHBOARD_URL="${DASHBOARD_URL:-https://dashboard.jujulefek.qzz.io}"
     
     cat > ".env" << EOF
 DASHBOARD_URL=$DASHBOARD_URL
+AGENT_PUBLIC_URL=$AGENT_PUBLIC_URL
 AUTH_KEY=GHOST_SECRET_2026
 EOF
-    echo "✅ .env created"
+    echo "✅ .env created with auto URL"
 else
     echo "✅ .env already exists"
     cat ".env"
