@@ -214,7 +214,7 @@ def kill_processes():
                     p.kill()
                 except: pass
         except: pass
-             
+              
     time.sleep(2)
     
     try:
@@ -241,6 +241,64 @@ def clean_system():
 
     try: os.system("sync") 
     except: pass
+
+# ==========================================
+# ✅ BARU: TERIMA DATA DARI DASHBOARD
+# ==========================================
+def save_data_from_dashboard(data):
+    """
+    ✅ NEW: Terima dan simpan data dari dashboard
+    Support kedua format:
+    - Plain email format
+    - Email:password format
+    """
+    try:
+        format_type = data.get('format_type', 'plain_email')
+        
+        if format_type == 'email_password':
+            # Format: email:password
+            credentials = data.get('credentials', [])
+            
+            # Save ke credentials.json
+            with open('credentials.json', 'w') as f:
+                json.dump(credentials, f, indent=2)
+            
+            # Also save emails ke email.txt untuk backward compat
+            emails = [c['email'] for c in credentials]
+            with open('email.txt', 'w') as f:
+                f.write("\n".join(emails) + "\n")
+            
+            print(f"✅ [DATA] Received {len(credentials)} credentials (email:password format)", flush=True)
+        
+        else:
+            # Plain email format
+            emails = data.get('emails', [])
+            with open('email.txt', 'w') as f:
+                f.write("\n".join(emails) + "\n")
+            
+            # Clean credentials jika ada
+            if os.path.exists('credentials.json'):
+                os.remove('credentials.json')
+            
+            print(f"✅ [DATA] Received {len(emails)} emails (plain format)", flush=True)
+        
+        # Save links
+        links = data.get('links', [])
+        with open('link.txt', 'w') as f:
+            f.write("\n".join(links) + "\n")
+        
+        # Clean empty lines
+        os.system("sed -i '/^$/d' email.txt link.txt")
+        
+        print(f"✅ [DATA] Received {len(links)} links", flush=True)
+        report_status("IDLE", f"Data Updated: {len(emails) if format_type == 'plain_email' else len(credentials)} emails, {len(links)} links")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ [DATA] Error saving data: {e}", flush=True)
+        report_status("IDLE", f"Data Error: {str(e)}")
+        return False
 
 # ==========================================
 # 🔄 AUTO REGISTER
@@ -456,6 +514,27 @@ def status():
         "format_type": format_type,
         "credentials_count": len(load_credentials())
     })
+
+@app.route('/update_data', methods=['POST'])
+def update_data():
+    """✅ NEW: Endpoint untuk menerima data dari dashboard"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        # Simpan data
+        success = save_data_from_dashboard(data)
+        
+        if success:
+            return jsonify({"status": "data_updated", "msg": "Data received and saved"})
+        else:
+            return jsonify({"error": "Failed to save data"}), 500
+            
+    except Exception as e:
+        print(f"❌ [UPDATE_DATA] Error: {e}", flush=True)
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/start/login', methods=['POST'])
 def menu_1():
