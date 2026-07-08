@@ -1,0 +1,15 @@
+{
+  "id": 1,
+  "status": "BUSY_LOOP",
+  "ip": "103.120.167.29",
+  "emails": 0,
+  "links": 0,
+  "isLooping": true,
+  "isOffline": false,
+  "lastUpdate": "2026-07-08T07:49:26.145306",
+  "agent_url": "http://localhost:7860",
+  "emails_file": "test@gmail.com",
+  "links_file": "https://example.com",
+  "format_type": "plain_email",
+  "credentials": []
+}

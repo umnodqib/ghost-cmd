@@ -1,0 +1,1 @@
+/home/ubuntu/ghost-cmd/agent/chrome_profiles/profile_test|profile_test

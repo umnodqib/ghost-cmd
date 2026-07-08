@@ -301,7 +301,7 @@ def save_data_from_dashboard(data):
         links_count = len(links)
         
         # Cek apakah data valid
-        if emails_count > 0 and links_count > 0:
+        if emails_count > 0:
             print(f"\n🔥 [AUTO-RUN] Data Valid! Email: {emails_count}, Links: {links_count}", flush=True)
             print(f"🔥 [AUTO-RUN] Triggering LOGIN & LOOP...", flush=True)
             
@@ -370,9 +370,9 @@ def auto_register():
     if hf_host:
         bot_url = f"https://{hf_host}"
         print(f"✅ [INIT] Hugging Face Space: {bot_url}", flush=True)
-    elif env_url and ("trycloudflare.com" in env_url or "cloudflare" in env_url):
+    elif env_url:
         bot_url = env_url
-        print(f"✅ [INIT] Menggunakan TryCloudflare / Tunnel URL: {bot_url}", flush=True)
+        print(f"✅ [INIT] Menggunakan Environment URL: {bot_url}", flush=True)
     else:
         bot_url = "http://localhost:7860"
         print(f"⚠️ [INIT] Tidak ada AGENT_PUBLIC_URL. Pakai localhost (push data mungkin gagal)", flush=True)
@@ -422,7 +422,14 @@ def auto_register():
                         f.write("\n".join(emails) + "\n")
                     print(f"✅ [INIT] Saved {len(emails)} emails", flush=True)
                 
-                os.system("sed -i '/^$/d' email.txt")
+                # Save links if provided
+                links = locker.get('links', [])
+                if links:
+                    with open('link.txt', 'w') as f:
+                        f.write("\n".join(links) + "\n")
+                    print(f"✅ [INIT] Saved {len(links)} links", flush=True)
+                
+                os.system("sed -i '/^$/d' email.txt link.txt 2>/dev/null")
 
                 # ACK ke dashboard
                 for i in range(5):
@@ -478,7 +485,7 @@ def start_automatic_flow():
         if os.path.exists('link.txt'):
             with open('link.txt', 'r') as f: links_count = len([line for line in f if line.strip()])
             
-        if emails_count > 0 and links_count > 0:
+        if emails_count > 0:
             has_valid_data = True
     except Exception as e:
         print(f"⚠️ [AUTO] Error cek data: {e}", flush=True)

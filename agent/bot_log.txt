@@ -1,0 +1,36 @@
+
+--- START LOGIN : Wed Jul  8 07:48:51 2026 ---
+
+>>> Login: test@gmail.com
+  Screenshot: /home/ubuntu/ghost-cmd/agent/bukti_login/MULAI_test@gmail.com_20260708_074856.png
+  Step 1: Masukkin email...
+  Step 2: Masukkin password...
+  Error: Message: 
+Stacktrace:
+#0 0x55770eb4d16a <unknown>
+#1 0x55770e54a6b9 <unknown>
+#2 0x55770e59ec0d <unknown>
+#3 0x55770e59ee51 <unknown>
+#4 0x55770e5e9b24 <unknown>
+#5 0x55770e5e6cbf <unknown>
+#6 0x55770e592222 <unknown>
+#7 0x55770e593011 <unknown>
+#8 0x55770eb12a0b <unknown>
+#9 0x55770eb1592d <unknown>
+#10 0x55770eaff948 <unknown>
+#11 0x55770eb164c0 <unknown>
+#12 0x55770eae6560 <unknown>
+#13 0x55770eb39dd8 <unknown>
+#14 0x55770eb39f75 <unknown>
+#15 0x55770eb4bbce <unknown>
+#16 0x7f622689caa4 <unknown>
+#17 0x7f6226929c6c <unknown>
+
+✅ Selesai. Mapping disimpan di mapping_profil.txt
+
+--- END LOGIN : Wed Jul  8 07:49:26 2026 ---
+
+--- START LOOP : Wed Jul  8 07:49:26 2026 ---
+🚀 [LOOP] Service Started. Monitoring via 'monitor.json'
+🧹 [CLEANUP] Scanning for stray Chrome processes...
+🔄 [LOOP] Starting Batch: 1 Workers | 1 Links

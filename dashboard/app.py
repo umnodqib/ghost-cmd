@@ -26,7 +26,8 @@ DATA_DIR = APP_DIR / "data"
 SLOTS_DIR = DATA_DIR / "slots"
 LOGS_DIR = DATA_DIR / "logs"
 
-AUTH_KEY = "GHOST_SECRET_2026"
+# AUTH_KEY can be set via env, default to the one requested by user
+AUTH_KEY = os.environ.get("AUTH_KEY", "GHOST_SECRET_2026")
 MAX_SLOTS = 192
 CURRENT_GRID = 6
 
@@ -282,39 +283,54 @@ def register_agent():
     agent_url = data.get('url')
     agent_ip = data.get('ip')
     
-    # Find available slot
+    # Find existing slot for this agent URL or IP
+    target_slot_id = None
     for slot_id in range(1, MAX_SLOTS + 1):
         slot = slot_manager.get_slot(slot_id)
-        if slot['isOffline'] or slot['status'] == '- Kosong -' or not slot['agent_url']:
-            # Assign slot
-            slot['agent_url'] = agent_url
-            slot['ip'] = agent_ip
-            slot['status'] = '🔌 WS CONNECTED'
-            slot['isOffline'] = False
+        if slot.get('agent_url') == agent_url or (slot.get('ip') == agent_ip and not slot.get('agent_url')):
+            target_slot_id = slot_id
+            break
             
-            # Load emails and links for this slot
-            if slot.get('format_type') == 'email_password' and slot.get('credentials'):
-                # Send credentials dengan password
-                emails = [c['email'] for c in slot['credentials']]
-                credentials = slot['credentials']
-            else:
-                # Plain email format
-                emails = slot['emails_file'].split('\n') if slot['emails_file'] else []
-                credentials = []
-            
-            links = slot['links_file'].split('\n') if slot['links_file'] else []
-            
-            slot_manager.save_slot(slot_id, slot)
-            
-            return jsonify({
-                "slot": slot_id,
-                "locker": {
-                    "emails": [e.strip() for e in emails if e.strip()],
-                    "links": [l.strip() for l in links if l.strip()],
-                    "credentials": credentials,
-                    "format_type": slot.get('format_type', 'plain_email')
-                }
-            }), 200
+    # If not found, find first empty slot
+    if not target_slot_id:
+        for slot_id in range(1, MAX_SLOTS + 1):
+            slot = slot_manager.get_slot(slot_id)
+            if slot['isOffline'] or slot['status'] == '- Kosong -' or not slot['agent_url']:
+                target_slot_id = slot_id
+                break
+    
+    if target_slot_id:
+        slot_id = target_slot_id
+        slot = slot_manager.get_slot(slot_id)
+        # Assign slot
+        slot['agent_url'] = agent_url
+        slot['ip'] = agent_ip
+        slot['status'] = '🔌 WS CONNECTED'
+        slot['isOffline'] = False
+        
+        # Load emails and links for this slot
+        if slot.get('format_type') == 'email_password' and slot.get('credentials'):
+            # Send credentials dengan password
+            emails = [c['email'] for c in slot['credentials']]
+            credentials = slot['credentials']
+        else:
+            # Plain email format
+            emails = slot['emails_file'].split('\n') if slot['emails_file'] else []
+            credentials = []
+        
+        links = slot['links_file'].split('\n') if slot['links_file'] else []
+        
+        slot_manager.save_slot(slot_id, slot)
+        
+        return jsonify({
+            "slot": slot_id,
+            "locker": {
+                "emails": [e.strip() for e in emails if e.strip()],
+                "links": [l.strip() for l in links if l.strip()],
+                "credentials": credentials,
+                "format_type": slot.get('format_type', 'plain_email')
+            }
+        }), 200
     
     return jsonify({"error": "No available slots"}), 503
 

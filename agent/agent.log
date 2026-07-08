@@ -1,0 +1,38 @@
+nohup: ignoring input
+🌉 [BRIDGE] Memulai Resolusi DNS Dinamis...
+🔍 [BRIDGE] Mencari IP untuk: localhost:5000...
+
+🔹 [AUTO] STEP 1: Melakukan Registrasi...
+🚀 Agent Flask API running on port 7860...
+⏳ [INIT] Menyiapkan URL Bot...
+ * Serving Flask app 'agent'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:7860
+ * Running on http://169.254.0.21:7860
+[33mPress CTRL+C to quit[0m
+✅ [INIT] Menggunakan Environment URL: http://localhost:7860
+📡 [INIT] Register ke Dashboard dengan URL: http://localhost:7860
+
+✅ [INIT] TERDAFTAR DI SLOT: 1
+🌐 Agent Public URL: http://localhost:7860
+✅ [INIT] Saved 0 emails
+✅ [ACK] Sinkronisasi Berhasil!
+⏳ [AUTO] STEP 2: Menunggu 10 detik...
+✅ [DATA] Received 1 emails (plain format)
+✅ [DATA] Received 1 links
+
+🔥 [AUTO-RUN] Data Valid! Email: 1, Links: 1
+🔥 [AUTO-RUN] Triggering LOGIN & LOOP...
+🛑 [CLEANUP] Killing active processes...
+
+🔹 [AUTO] STEP 3: Data terdeteksi. Running login.py...
+🚀 [TASK] Memulai: LOGIN
+⚠️ Error cleanup: [Errno 1] Operation not permitted: '/tmp/.X0-lock'
+⚠️ [AUTO-RUN] Process already running, skipping auto-run
+127.0.0.1 - - [08/Jul/2026 07:48:53] "POST /update_data HTTP/1.1" 200 -
+✅ [TASK] LOGIN Selesai.
+
+🔹 [AUTO] STEP 4: Login selesai. Running loop.py...
+🚀 [TASK] Memulai: LOOP
