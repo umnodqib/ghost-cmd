@@ -1,0 +1,22 @@
+# Logs
+*.log
+agent/bot_log.txt
+agent/monitor.json
+
+# Data
+dashboard/data/
+agent/email.txt
+agent/link.txt
+agent/credentials.json
+agent/mapping_profil.txt
+
+# Chrome Profiles
+agent/chrome_profiles/
+agent/bukti_login/
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+.venv/
+venv/
